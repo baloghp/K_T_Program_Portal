@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="corporate">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kuoni Tumlare Program Portal</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- DaisyUI -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.min.css" rel="stylesheet" type="text/css" />
+  
+  <!-- Mermaid.js for diagrams -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'rag-green': '#10b981',
+            'rag-amber': '#f59e0b',
+            'rag-red': '#ef4444'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen bg-base-200">
+  <!-- Header -->
+  <header class="bg-base-100 shadow-lg">
+    <!-- Top Title Bar -->
+    <div class="navbar">
+      <div class="navbar-start">
+        <h1 class="text-2xl font-bold text-base-content">Kuoni Tumlare Program Portal</h1>
+      </div>
+      <div class="navbar-end">
+        <!-- Theme Switcher -->
+        <div class="dropdown dropdown-end">
+          <div tabindex="0" role="button" class="btn btn-ghost">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"></path>
+            </svg>
+            Theme
+          </div>
+          <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+            <li><a onclick="setTheme('corporate')">Corporate</a></li>
+            <li><a onclick="setTheme('business')">Business</a></li>
+            <li><a onclick="setTheme('light')">Light</a></li>
+            <li><a onclick="setTheme('dark')">Dark</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Layer Filters -->
+    <div class="bg-base-200 border-t border-base-300 px-6 py-4">
+      <div class="flex flex-wrap items-center gap-4">
+        <span class="text-sm font-medium text-base-content">Layer Filters:</span>
+        
+        <!-- Program Filter -->
+        <div class="form-control">
+          <label class="label cursor-pointer">
+            <input type="radio" name="layerFilter" value="program" class="radio radio-primary" checked />
+            <span class="label-text ml-2">Program</span>
+          </label>
+        </div>
+        
+        <!-- Stream Filter -->
+        <div class="form-control">
+          <label class="label cursor-pointer">
+            <input type="radio" name="layerFilter" value="stream" class="radio radio-primary" />
+            <span class="label-text ml-2">Stream</span>
+          </label>
+        </div>
+        
+        <!-- Country Filter -->
+        <div class="form-control">
+          <label class="label cursor-pointer">
+            <input type="radio" name="layerFilter" value="country" class="radio radio-primary" />
+            <span class="label-text ml-2">Country</span>
+          </label>
+        </div>
+        
+        <!-- Vendor Filter -->
+        <div class="form-control">
+          <label class="label cursor-pointer">
+            <input type="radio" name="layerFilter" value="vendor" class="radio radio-primary" />
+            <span class="label-text ml-2">Vendor</span>
+          </label>
+        </div>
+        
+         <!-- Additional Filters -->
+         <div class="divider divider-horizontal"></div>
+         
+         <!-- Stream Selector (only visible when Stream layer is selected) -->
+         <div id="streamFilter" class="form-control hidden">
+           <select id="streamSelect" class="select select-bordered select-sm">
+             <option disabled selected>Select Stream</option>
+             <option>All Streams</option>
+             <option>Feature Streams</option>
+             <option>Core Streams</option>
+             <option>Specialized Streams</option>
+             <option>Enabler Streams</option>
+           </select>
+         </div>
+         
+         <!-- Country Selector (only visible when Country layer is selected) -->
+         <div id="countryFilter" class="form-control hidden">
+           <select id="countrySelect" class="select select-bordered select-sm">
+             <option disabled selected>Country</option>
+             <option>Germany</option>
+             <option>France</option>
+             <option>Japan</option>
+             <option>Singapore</option>
+           </select>
+         </div>
+         
+         <!-- Timeframe Selector (always visible) -->
+         <div class="form-control">
+           <select class="select select-bordered select-sm">
+             <option disabled selected>Timeframe - Mock only</option>
+             <option>Q1 2025</option>
+             <option>Q2 2025</option>
+             <option>Q3 2025</option>
+             <option>Q4 2025</option>
+           </select>
+         </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex min-h-screen">
+    <!-- Left Sidebar Menu -->
+    <aside class="w-80 bg-base-100 shadow-lg border-r border-base-300">
+      <div class="p-6">
+        <h3 class="text-lg font-semibold text-base-content mb-4">Navigation</h3>
+        <nav class="space-y-2">
+          <button onclick="navigateTo('kpis')" class="nav-item block w-full text-left btn btn-ghost justify-start" data-section="kpis">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            KPIs
+          </button>
+          
+          <button onclick="navigateTo('roadmaps')" class="nav-item block w-full text-left btn btn-ghost justify-start" data-section="roadmaps">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Roadmaps
+          </button>
+          
+          <button onclick="navigateTo('quarterly')" class="nav-item block w-full text-left btn btn-ghost justify-start" data-section="quarterly">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            Quarterly Planning (BRP/QBR)
+          </button>
+          
+          <button onclick="navigateTo('meetings')" class="nav-item block w-full text-left btn btn-ghost justify-start" data-section="meetings">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+            Meetings & Notes
+          </button>
+          
+          <button onclick="navigateTo('budget')" class="nav-item block w-full text-left btn btn-ghost justify-start" data-section="budget">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+            </svg>
+            Budget
+          </button>
+          
+          <button onclick="navigateTo('raid')" class="nav-item block w-full text-left btn btn-ghost justify-start" data-section="raid">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+            RAID
+          </button>
+          
+              <button onclick="navigateTo('ccb')" class="nav-item block w-full text-left btn btn-ghost justify-start" data-section="ccb">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Change Management (CCB)
+              </button>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 p-6">
+      <div id="main-content"></div>
+    </div>
+  </main>
+
+          <!-- Components -->
+          <script src="components/kpi-cards.js"></script>
+          <script src="components/kpi-stream.js"></script>
+          <script src="components/roadmaps.js"></script>
+          <script src="components/kpi-country.js"></script>
+          <script src="components/kpi-vendor.js"></script>
+          <script src="components/quarterly-planning.js"></script>
+          <script src="components/raid-management.js"></script>
+          <script src="components/meetings.js"></script>
+          <script src="components/budget.js"></script>
+          <script src="components/ccb-management.js"></script>
+          <script src="components/coming-soon.js"></script>
+  
+  <script>
+    // Application State
+    const appState = {
+      currentSection: 'welcome',
+      currentLayer: 'program',
+      currentStream: null,
+      currentTimeframe: null,
+      currentCountry: null
+    };
+
+    // Theme switcher functionality
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+    }
+
+    // Navigation functionality
+    function navigateTo(section) {
+      // Update state
+      appState.currentSection = section;
+      
+      // Hide welcome content if it exists
+      const welcomeContent = document.getElementById('welcome-content');
+      if (welcomeContent) {
+        welcomeContent.classList.add('hidden');
+      }
+      
+      // Hide all other content sections (but not main-content)
+      const allSections = document.querySelectorAll('[id$="-content"]:not(#main-content)');
+      allSections.forEach(section => section.classList.add('hidden'));
+      
+      // Show selected section
+      const targetSection = document.getElementById(section + '-content');
+      if (targetSection) {
+        targetSection.classList.remove('hidden');
+        // Ensure section is visible
+        targetSection.style.display = 'block';
+        targetSection.style.visibility = 'visible';
+        targetSection.style.opacity = '1';
+      } else {
+        console.log('Target section not found:', section + '-content');
+      }
+      
+      // Update navigation active state
+      updateNavigationState(section);
+      
+      // Load section content based on current filters
+      // Add a small delay to ensure section is visible before loading content
+      setTimeout(() => {
+        loadSectionContent(section);
+      }, 50);
+    }
+
+    // Update navigation active state
+    function updateNavigationState(activeSection) {
+      const navItems = document.querySelectorAll('.nav-item');
+      navItems.forEach(item => {
+        const section = item.getAttribute('data-section');
+        if (section === activeSection) {
+          item.classList.remove('btn-ghost');
+          item.classList.add('btn-primary');
+        } else {
+          item.classList.remove('btn-primary');
+          item.classList.add('btn-ghost');
+        }
+      });
+    }
+
+    // Load content based on current section and filters
+    function loadSectionContent(section) {
+      const layer = appState.currentLayer;
+      const stream = appState.currentStream;
+      const timeframe = appState.currentTimeframe;
+      const country = appState.currentCountry;
+      
+      console.log(`Loading ${section} for layer: ${layer}, stream: ${stream}, timeframe: ${timeframe}, country: ${country}`);
+      
+      // KISS: Clear the main content container; components include their own headers
+      const mainContent = document.getElementById('main-content');
+      if (mainContent) {
+        mainContent.innerHTML = '';
+      }
+      
+      switch(section) {
+        case 'kpis':
+          console.log('Loading KPIs section...');
+          loadKPIContent(layer, stream, timeframe, country);
+          break;
+        case 'roadmaps':
+          loadRoadmapsContent(layer, stream, timeframe, country);
+          break;
+        case 'quarterly':
+          loadQuarterlyContent(layer, stream, timeframe, country);
+          break;
+        case 'meetings':
+          loadMeetingsContent(layer, stream, timeframe, country);
+          break;
+        case 'budget':
+          loadBudgetContent(layer, stream, timeframe, country);
+          break;
+        case 'raid':
+          loadRAIDContent(layer, stream, timeframe, country);
+          break;
+            case 'ccb':
+              loadCCBContent(layer, stream, timeframe, country);
+              break;
+        default:
+          console.log('Unknown section:', section);
+      }
+    }
+
+    // Content loading functions (to be implemented)
+    function loadKPIContent(layer, stream, timeframe, country) {
+      const container = document.getElementById('main-content');
+      console.log('Loading KPI content into:', container);
+      console.log('createKPICards function available:', typeof createKPICards);
+      
+      if (container) {
+        if (appState.currentLayer === 'stream' && typeof createStreamKPIs === 'function') {
+          const streamSelect = document.getElementById('streamSelect');
+          const selectedStream = streamSelect && streamSelect.value !== 'Select Stream' ? streamSelect.value : null;
+          container.innerHTML = createStreamKPIs(selectedStream);
+        } else if (appState.currentLayer === 'country' && typeof createCountryKPIs === 'function') {
+          // For mock purposes, ignore country selection and render generic country KPIs
+          container.innerHTML = createCountryKPIs('Country');
+        } else if (appState.currentLayer === 'vendor' && typeof createVendorKPIs === 'function') {
+          // For mock purposes, render generic vendor KPIs
+          container.innerHTML = createVendorKPIs('Vendor');
+        } else if (typeof createKPICards === 'function') {
+          container.innerHTML = createKPICards();
+        }
+        console.log('KPI content loaded successfully');
+        console.log('Container innerHTML length:', container.innerHTML.length);
+        console.log('Container visible:', container.offsetHeight > 0);
+      } else {
+        const mainContent = document.getElementById('main-content');
+        if (mainContent) {
+          mainContent.innerHTML = '<div class="text-center py-8"><p class="text-base-content/70">KPI content loading...</p></div>';
+        }
+      }
+    }
+
+    function loadRoadmapsContent(layer, stream, timeframe, country) {
+      const container = document.getElementById('main-content');
+      
+      if (container && typeof createLayerRoadmap === 'function') {
+        // Use layer-specific roadmap if available, otherwise fall back to program roadmap
+        if (layer && ['stream', 'country', 'vendor'].includes(layer)) {
+          container.innerHTML = createLayerRoadmap(layer);
+          // After inserting HTML, mount Mermaid rendering without inline scripts
+          if (typeof mountLayerRoadmap === 'function') {
+            // Slight delay ensures DOM is painted before Mermaid runs
+            setTimeout(() => mountLayerRoadmap(layer), 0);
+          }
+        } else if (typeof createProgramRoadmap === 'function') {
+          container.innerHTML = createProgramRoadmap();
+        } else {
+          container.innerHTML = '<div class="text-center py-8"><p class="text-base-content/70">Roadmaps content coming soon...</p></div>';
+        }
+      } else if (container) {
+        // Fallback if component not loaded
+        container.innerHTML = '<div class="text-center py-8"><p class="text-base-content/70">Roadmaps content coming soon...</p></div>';
+      }
+    }
+
+    function loadQuarterlyContent(layer, stream, timeframe, country) {
+      const container = document.getElementById('main-content');
+      
+      if (container && typeof createQuarterlyPlanning === 'function') {
+        container.innerHTML = createQuarterlyPlanning(layer);
+      } else if (container) {
+        // Fallback if component not loaded
+        container.innerHTML = '<div class="text-center py-8"><p class="text-base-content/70">Quarterly planning content coming soon...</p></div>';
+      }
+    }
+
+    function loadMeetingsContent(layer, stream, timeframe, country) {
+      const container = document.getElementById('main-content');
+      
+      if (container && typeof createMeetings === 'function') {
+        container.innerHTML = createMeetings(layer || 'program');
+      } else if (container) {
+        // Fallback if component not loaded
+        container.innerHTML = '<div class="text-center py-8"><p class="text-base-content/70">Meetings & notes content coming soon...</p></div>';
+      }
+    }
+
+    function loadBudgetContent(layer, stream, timeframe, country) {
+      const container = document.getElementById('main-content');
+      
+      if (container && typeof createBudget === 'function') {
+        container.innerHTML = createBudget(layer || 'program');
+      } else if (container) {
+        // Fallback if component not loaded
+        container.innerHTML = '<div class="text-center py-8"><p class="text-base-content/70">Budget content coming soon...</p></div>';
+      }
+    }
+
+    function loadRAIDContent(layer, stream, timeframe, country) {
+      const container = document.getElementById('main-content');
+      
+      if (container && typeof createRAIDManagement === 'function') {
+        container.innerHTML = createRAIDManagement(layer);
+      } else if (container) {
+        // Fallback if component not loaded
+        container.innerHTML = '<div class="text-center py-8"><p class="text-base-content/70">RAID content coming soon...</p></div>';
+      }
+    }
+
+    function loadCCBContent(layer, stream, timeframe, country) {
+      const container = document.getElementById('main-content');
+      
+      if (container && typeof createCCBManagement === 'function') {
+        container.innerHTML = createCCBManagement(layer);
+      } else if (container) {
+        // Fallback if component not loaded
+        container.innerHTML = '<div class="text-center py-8"><p class="text-base-content/70">Change Management content coming soon...</p></div>';
+      }
+    }
+
+         // Filter change handlers
+         function updateLayerFilter() {
+           const layerRadios = document.querySelectorAll('input[name="layerFilter"]');
+           layerRadios.forEach(radio => {
+             if (radio.checked) {
+               appState.currentLayer = radio.value;
+               
+               // Show/hide filter dropdowns based on selected layer
+               const streamFilter = document.getElementById('streamFilter');
+               const countryFilter = document.getElementById('countryFilter');
+               
+               if (streamFilter && countryFilter) {
+                 // Hide all filters first
+                 streamFilter.classList.add('hidden');
+                 countryFilter.classList.add('hidden');
+                 
+                 // Show appropriate filter based on layer
+                 if (radio.value === 'stream') {
+                   streamFilter.classList.remove('hidden');
+                 } else if (radio.value === 'country') {
+                   countryFilter.classList.remove('hidden');
+                 }
+               }
+               
+               // Reload current section with new layer
+               loadSectionContent(appState.currentSection);
+             }
+           });
+         }
+        
+        // Stream filter change handler
+        function updateStreamFilter() {
+          const streamSelect = document.getElementById('streamSelect');
+          if (streamSelect) {
+            appState.currentStream = streamSelect.value;
+            // Reload current section with new stream if we're in stream layer
+            if (appState.currentLayer === 'stream') {
+              loadSectionContent(appState.currentSection);
+            }
+          }
+        }
+        
+        // Country filter change handler
+        function updateCountryFilter() {
+          // Ignored for mock: we always show generic country KPIs regardless of selection
+          if (appState.currentLayer === 'country') {
+            loadSectionContent(appState.currentSection);
+          }
+        }
+
+    // Go back to welcome page
+    function goToWelcome() {
+      // Hide all content sections
+      const allSections = document.querySelectorAll('[id$="-content"]');
+      allSections.forEach(section => section.classList.add('hidden'));
+      
+      // Show welcome content
+      const welcomeContent = document.getElementById('welcome-content');
+      if (welcomeContent) {
+        welcomeContent.classList.remove('hidden');
+      }
+      
+      // Update navigation state
+      updateNavigationState('welcome');
+      
+      // Update app state
+      appState.currentSection = 'welcome';
+    }
+
+    // Initialize application
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM loaded, initializing application...');
+      
+      // Load saved theme
+      const savedTheme = localStorage.getItem('theme') || 'corporate';
+      setTheme(savedTheme);
+      
+      // Check if KPI component is available
+      console.log('createKPICards function available on load:', typeof createKPICards);
+      
+      // Load initial content into main container (Program level KPIs)
+      const mainContent = document.getElementById('main-content');
+      if (mainContent && typeof createKPICards === 'function') {
+        mainContent.innerHTML = createKPICards();
+      }
+      
+       // Set up filter change listeners
+       const layerRadios = document.querySelectorAll('input[name="layerFilter"]');
+       layerRadios.forEach(radio => {
+         radio.addEventListener('change', updateLayerFilter);
+       });
+       
+       // Initialize filter visibility based on default selection
+       updateLayerFilter();
+      
+      // Set up stream filter change listener
+      const streamSelect = document.getElementById('streamSelect');
+      if (streamSelect) {
+        streamSelect.addEventListener('change', updateStreamFilter);
+      }
+      
+      // Set up country filter change listener
+      const countrySelect = document.getElementById('countrySelect');
+      if (countrySelect) {
+        countrySelect.addEventListener('change', updateCountryFilter);
+      }
+      
+      // Set initial navigation state
+      updateNavigationState('kpis');
+    });
+  </script>
+</body>
+</html>
