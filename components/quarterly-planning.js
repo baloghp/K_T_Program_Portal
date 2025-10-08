@@ -13,6 +13,11 @@ function createQuarterlyPlanning(layer) {
     'stream': {
       title: 'Stream Level BRP/QBR',
       description: 'Stream-specific commitments and delivery plans',
+      commitmentMetrics: {
+        committed: { total: 30, toFinish: 18, withCommittedDate: 12 },
+        conditional: { total: 10, mayFinish: 3, remaining: 7 },
+        stretch: { total: 8, mightFinish: 2, remaining: 6 }
+      },
       teams: [
         {
           name: 'Feature Streams Team',
@@ -45,6 +50,11 @@ function createQuarterlyPlanning(layer) {
     'country': {
       title: 'Country Level BRP/QBR',
       description: 'Country-specific rollout commitments and delivery plans',
+      commitmentMetrics: {
+        committed: { total: 20, toFinish: 12, withCommittedDate: 8 },
+        conditional: { total: 6, mayFinish: 2, remaining: 4 },
+        stretch: { total: 5, mightFinish: 1, remaining: 4 }
+      },
       teams: [
         {
           name: 'Germany Rollout Team',
@@ -77,6 +87,11 @@ function createQuarterlyPlanning(layer) {
     'vendor': {
       title: 'Vendor Level BRP/QBR',
       description: 'Vendor partnership commitments and delivery plans',
+      commitmentMetrics: {
+        committed: { total: 16, toFinish: 9, withCommittedDate: 7 },
+        conditional: { total: 5, mayFinish: 2, remaining: 3 },
+        stretch: { total: 4, mightFinish: 1, remaining: 3 }
+      },
       teams: [
         {
           name: 'Primary Vendor Partnership',
@@ -110,12 +125,17 @@ function createQuarterlyPlanning(layer) {
 
   const data = layerData[layer] || layerData['program'];
 
+  const metrics = data.commitmentMetrics;
+
   return `
     <section class="space-y-6">
       <header>
         <h2 class="text-3xl font-semibold text-base-content mb-2">${title}</h2>
         <p class="text-base-content/70">${data.description}</p>
       </header>
+
+      <!-- Quarterly Commitments (Committed / Conditional / Stretch) -->
+      ${metrics ? renderCommitmentsSection(metrics) : ''}
 
       <!-- Summary Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -398,6 +418,12 @@ function createProgramQuarterlyView(title) {
         <p class="text-base-content/70">Program-level aggregation of stream commitments, value delivery and quarterly budget</p>
       </header>
 
+      ${renderCommitmentsSection({
+        committed: { total: 90, toFinish: 58, withCommittedDate: 32 },
+        conditional: { total: 24, mayFinish: 7, remaining: 15 },
+        stretch: { total: 24, mightFinish: 4, remaining: 20 }
+      })}
+
       <!-- Summary Cards -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-2">
         <div class="card bg-base-100 shadow-xl"><div class="card-body">
@@ -527,6 +553,81 @@ function createProgramQuarterlyView(title) {
         </div>
       </div>
     </section>
+  `;
+}
+
+// Helpers
+function renderCommitmentsSection(metrics) {
+  const c = metrics.committed;
+  const d = metrics.conditional;
+  const s = metrics.stretch;
+  return `
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      ${renderCommitmentDonut('To work on', c.total, c.toFinish, c.withCommittedDate, 'Committed scope', [
+        `Teams are committed to work on <strong>${c.total}</strong> items this quarter.`,
+        `<strong>${c.withCommittedDate}</strong> have a committed delivery date within the quarter.`,
+        `<strong>${c.toFinish}</strong> to finish.`
+      ])}
+      ${renderConditionalDonut('Work on conditionally', d.total, d.mayFinish, d.remaining, 'Conditional Scope', [
+        `Teams are missing prerequisites for <strong>${d.total}</strong> items.`,
+        `<strong>${d.mayFinish}</strong> may still be finished if conditions are met.`,
+        `<strong>${d.remaining}</strong> will be worked on as conditions are met.`
+      ])}
+      ${renderStretchDonut('Work on if possible', s.total, s.mightFinish, s.remaining, 'Stretch Scope', [
+        `Lower-priority or opportunistic scope of <strong>${s.total}</strong> items.`,
+        `<strong>${s.mightFinish}</strong> might be finished if time permits.`,
+        `<strong>${s.remaining}</strong> remaining.`
+      ])}
+    </div>
+  `;
+}
+
+function renderCommitmentDonut(title, total, finishedPart, datePart, caption, bullets) {
+  return renderDonutCard(title, total, finishedPart, datePart, caption, bullets, '+');
+}
+
+function renderConditionalDonut(title, total, mayFinishPart, remainingPart, caption, bullets) {
+  return renderDonutCard(title, total, mayFinishPart, remainingPart, caption, bullets, '?');
+}
+
+function renderStretchDonut(title, total, mightFinishPart, remainingPart, caption, bullets) {
+  return renderDonutCard(title, total, mightFinishPart, remainingPart, caption, bullets, '+');
+}
+
+function renderDonutCard(titleText, total, highlight, secondary, caption, bullets, centerIcon) {
+  const r = 48;
+  const circumference = 2 * Math.PI * r;
+  const highlightLen = Math.max(0, Math.min(1, (highlight || 0) / Math.max(1, total))) * circumference;
+  const strokeGap = circumference - highlightLen;
+  return `
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h3 class="card-title text-lg mb-2">${titleText}</h3>
+        <div class="flex items-center space-x-6">
+          <div class="relative w-40 h-40">
+            <svg viewBox="0 0 120 120" class="w-40 h-40">
+              <circle cx="60" cy="60" r="${r}" fill="none" stroke="currentColor" stroke-width="12" opacity="0.15"></circle>
+              <circle cx="60" cy="60" r="${r}" fill="none" stroke="#34d399" stroke-width="12" stroke-linecap="round" stroke-dasharray="${highlightLen} ${strokeGap}" transform="rotate(-90 60 60)"></circle>
+              <circle cx="60" cy="60" r="32" fill="currentColor" opacity="0.06"></circle>
+              <text x="60" y="56" text-anchor="middle" class="fill-base-content" font-size="22" font-weight="700">${centerIcon}</text>
+              <text x="60" y="78" text-anchor="middle" class="fill-base-content/70" font-size="16">${total}</text>
+            </svg>
+          </div>
+          <div>
+            <div class="text-sm text-base-content/60">${caption}</div>
+            <ul class="mt-2 text-sm space-y-1">
+              ${bullets.map(b => `<li>${b}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+        <div class="mt-3 flex items-center space-x-4 text-sm">
+          <span class="badge badge-success">${highlight}</span>
+          <span class="text-base-content/60">highlighted segment</span>
+          <span class="badge badge-ghost">${secondary}</span>
+          <span class="text-base-content/60">other within category</span>
+        </div>
+      </div>
+    </div>
   `;
 }
 
